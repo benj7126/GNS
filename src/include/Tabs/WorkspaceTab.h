@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../Tab.h"
-#include "../Workspace.h"
+#include "Tab.h"
+#include "Workspace.h"
 
-#include "../Workspaces/BlankWorkspace.h"
+#include "Workspaces/BlankWorkspace.h"
 
 #include <memory>
 

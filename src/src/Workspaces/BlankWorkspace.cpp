@@ -1,4 +1,4 @@
-#include "../../include/Workspaces/BlankWorkspace.h"
+#include "Workspaces/BlankWorkspace.h"
 
 void Workspaces::BlankWorkspace::Draw(int x, int y, int w, int h) {
 	// scissor mode

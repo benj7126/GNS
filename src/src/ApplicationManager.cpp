@@ -1,9 +1,9 @@
-#include "../include/ApplicationManager.h"
+#include "ApplicationManager.h"
 
-#include "../include/Tabs/WorkspaceTab.h"
-#include "../include/Tabs/NoteManagerTap.h"
-#include "../include/Tabs/SettingsTab.h"
-#include "../include/TextInputHandler.h"
+#include "Tabs/WorkspaceTab.h"
+#include "Tabs/NoteManagerTap.h"
+#include "Tabs/SettingsTab.h"
+#include "TextInputHandler.h"
 
 #include <memory>
 #include <raylib.h>

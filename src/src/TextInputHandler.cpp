@@ -1,4 +1,4 @@
-#include "../include/TextInputHandler.h"
+#include "TextInputHandler.h"
 
 #include <raylib.h>
 #include <string>

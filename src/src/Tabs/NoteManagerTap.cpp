@@ -1,4 +1,4 @@
-#include "../../include/Tabs/NoteManagerTap.h"
+#include "Tabs/NoteManagerTap.h"
 
 Tabs::NoteManagerTap::NoteManagerTap() {
 	Name = "Note Manager";

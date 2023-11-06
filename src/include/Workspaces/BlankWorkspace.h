@@ -1,9 +1,11 @@
 #pragma once
 
-#include "../Workspace.h"
-#include "../Note.h"
+#include "Workspace.h"
+#include "Note.h"
+#include "Elements/SimpleTextField.h"
 
-#include "../Elements/SimpleTextField.h"
+#include <raylib.h>
+#include <vector>
 
 
 namespace Workspaces {

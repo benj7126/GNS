@@ -1,6 +1,6 @@
-#include "../include/FontManager.h"
+#include "FontManager.h"
 
-#include "../include/Tabs/SettingsTab.h"
+#include "Tabs/SettingsTab.h"
 
 std::unordered_map<std::string, Font> FontManager::fontMap{};
 

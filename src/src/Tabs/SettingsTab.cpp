@@ -1,4 +1,4 @@
-#include "../../include/Tabs/SettingsTab.h"
+#include "Tabs/SettingsTab.h"
 
 #include <memory>
 

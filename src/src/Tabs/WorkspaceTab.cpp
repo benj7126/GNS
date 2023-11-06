@@ -1,4 +1,4 @@
-#include "../../include/Tabs/WorkspaceTab.h"
+#include "Tabs/WorkspaceTab.h"
 
 Tabs::WorkspaceTab::WorkspaceTab() {
 	Name = "New Tab"; // for now, need to be the name of the current workspace

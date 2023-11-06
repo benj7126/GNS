@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Tab.h"
+#include "Tab.h"
 
 #include <optional>
 #include <string>

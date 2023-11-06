@@ -1,7 +1,7 @@
 #include <iostream>
 #include <raylib.h>
-//#include "../include/FontManager.h"
-#include "../include/ApplicationManager.h"
+//#include "FontManager.h"
+#include "ApplicationManager.h"
 
 int main(void) {
     // const int screenWidth = 800;

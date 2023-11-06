@@ -1,6 +1,6 @@
-#include "../include/Tab.h"
-#include "../include/FontManager.h"
-#include "../include/Tabs/SettingsTab.h"
+#include "Tab.h"
+#include "FontManager.h"
+#include "Tabs/SettingsTab.h"
 
 #include <raylib.h>
 

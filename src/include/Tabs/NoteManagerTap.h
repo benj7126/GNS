@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Tab.h"
+#include "Tab.h"
 
 namespace Tabs { // managing note types
 	class NoteManagerTap : public Tab {

@@ -1,7 +1,7 @@
-#include "../../include/Elements/SimpleTextField.h"
+#include "Elements/SimpleTextField.h"
 
-#include "../../include/TextInputHandler.h"
-#include "../../include/FontManager.h"
+#include "TextInputHandler.h"
+#include "FontManager.h"
 
 void Elements::SimpleTextField::Draw() {
 	int fontSize = 12;
@@ -15,3 +15,5 @@ void Elements::SimpleTextField::Draw() {
 void Elements::SimpleTextField::MousePressed(Vector2 pos) {
 	TextInputHandler::LinkForInput(&text);
 }
+
+// need to make it so that only one element can be selected at a time and then make it work that way around instead of making TextInputHandler edit a pointer...
