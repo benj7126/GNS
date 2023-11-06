@@ -25,6 +25,8 @@ namespace Workspaces {
 		void TestAddNote() {
 			NoteWithPosition testNote{ std::make_shared<Note>(), {0, 0} };
 
+			testNote.note.get()->size = {50, 50};
+
 			testNote.note.get()->elements.push_back(std::make_shared<Elements::SimpleTextField>());
 
 			notes.push_back(testNote);

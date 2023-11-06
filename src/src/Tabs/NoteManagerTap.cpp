@@ -5,3 +5,5 @@ Tabs::NoteManagerTap::NoteManagerTap() {
 }
 
 void Tabs::NoteManagerTap::Draw(int x, int y, int w, int h) {}
+
+void Tabs::NoteManagerTap::Update() {}

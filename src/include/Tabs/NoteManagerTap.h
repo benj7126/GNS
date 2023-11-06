@@ -7,5 +7,6 @@ namespace Tabs { // managing note types
 	public:
 		NoteManagerTap();
 		void Draw(int x, int y, int w, int h) override;
+		void Update() override;
 	};
 }

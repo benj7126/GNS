@@ -10,7 +10,8 @@ namespace Elements { // managing note types
 		std::string text;
 
 	public:
-		void Draw() override;
+		void Draw(Vector2 offset) override;
+		void Update() override;
 		void MousePressed(Vector2 position) override;
 	};
 }

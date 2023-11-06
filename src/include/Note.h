@@ -9,13 +9,16 @@
 
 class Note {
 public:
-	std::string Name;
+	std::string Name; // more like a yupe
 	Vector2 size;
 	std::vector<std::shared_ptr<Element>> elements;
 
-	virtual void Draw() {
+	virtual void Draw(Vector2 position) {
+		DrawRectangle(position.x, position.y, size.x, size.y, WHITE);
+		DrawRectangleLines(position.x, position.y, size.x, size.y, BLACK);
+
 		for (std::shared_ptr<Element> e : elements) {
-			e.get()->Draw();
+			e.get()->Draw(position);
 		}
 	};
 

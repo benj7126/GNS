@@ -3,7 +3,6 @@
 #include "Tabs/WorkspaceTab.h"
 #include "Tabs/NoteManagerTap.h"
 #include "Tabs/SettingsTab.h"
-#include "TextInputHandler.h"
 
 #include <memory>
 #include <raylib.h>
@@ -36,11 +35,14 @@ void ApplicationManager::Draw() {
 }
 
 void ApplicationManager::Update() {
-	TextInputHandler::Update();
+	// TextInputHandler::Update();
+	
+	tabs[curTap].get()->Update();
 
 	if (IsMouseButtonPressed(0)) {
-		// resete input
-		TextInputHandler::LinkForInput(nullptr);
+		// reset ~input~ well, selected now
+		//TextInputHandler::LinkForInput(nullptr);
+		Element::ClearSelected();
 
 		bool allowWokspacePress = true;
 

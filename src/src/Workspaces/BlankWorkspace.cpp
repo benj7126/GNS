@@ -7,7 +7,7 @@ void Workspaces::BlankWorkspace::Draw(int x, int y, int w, int h) {
 	DrawRectangle(0, 0, 2000, 2000, BLUE);
 
 	for (NoteWithPosition NWP : notes) {
-		NWP.note.get()->Draw();
+		NWP.note.get()->Draw({x + NWP.position.x, y + NWP.position.y});
 	}
 
 	EndScissorMode();
@@ -24,4 +24,8 @@ void Workspaces::BlankWorkspace::MousePressed(int x, int y) {
 	}
 }
 
-void Workspaces::BlankWorkspace::Update() {}
+void Workspaces::BlankWorkspace::Update() {
+	for (NoteWithPosition NWP : notes) {
+		NWP.note.get()->Update();
+	}
+}

@@ -4,12 +4,16 @@
 #include <string>
 
 class Element {
+protected:
+	static Element* selectedElement;
+
 public:
+	static void ClearSelected() { selectedElement = nullptr; };
 	std::string Name;
 	Vector2 position;
 	Vector2 size;
 
-	virtual void Draw() = 0;
+	virtual void Draw(Vector2 offset) = 0;
 	virtual void Update() {};
 	virtual void MousePressed(Vector2 position) {};
 };
