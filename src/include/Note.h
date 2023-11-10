@@ -30,7 +30,9 @@ public:
 
 	virtual void MousePressed(Vector2 position) {
 		for (std::shared_ptr<Element> e : elements) {
-			e.get()->MousePressed(position); // needs aabb check
+			if (e->position.x < position.x && e->position.x + e->size.x > position.x && e->position.y < position.y && e->position.y + e->size.y > position.y){
+				e.get()->MousePressed({position.x - e->position.x, position.y - e->position.y});
+			}
 		}
 	};
 };

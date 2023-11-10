@@ -5,7 +5,7 @@
 #include <string>
 
 namespace Elements { // managing note types
-	class SimpleTextField : public Element {
+	class TextField : public Element {
 	protected:
 		std::string text = "";
 		int cursorPosition = 0;
@@ -18,6 +18,13 @@ namespace Elements { // managing note types
 
 		Color textColor = BLACK;
 		Color backgroundColor = WHITE;
+
+		/* dont know if its possible
+		int paddingUp = 5;
+		int paddingDown = 5;
+		int paddingLeft = 5;
+		int paddingRight = 5;
+		*/
 
 	public:
 		void Draw(Vector2 offset) override;

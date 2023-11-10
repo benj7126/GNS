@@ -4,17 +4,18 @@
 
 #include <iostream>
 
-void Elements::SimpleTextField::Draw(Vector2 offset) {
+void Elements::TextField::Draw(Vector2 offset) {
 	// std::cout << offset.x + position.x << offset.y + position.y << size.x << size.y << std::endl;
 	// std::cout << textFont << std::endl;
 	Font font = FontManager::GetFont(fontType, fontSize);
 	
+	size.y = fontSize; // might want to set this when you change size instead, as to make it constant somehow...
 	DrawRectangle(offset.x + position.x, offset.y + position.y, size.x, size.y, ORANGE); // size is {0, 0}...
 	
 	CustomTextDraw({offset.x + position.x, offset.y + position.y});
 }
 
-void Elements::SimpleTextField::CustomTextDraw(Vector2 origin){
+void Elements::TextField::CustomTextDraw(Vector2 origin){
 	Font font = FontManager::GetFont(fontType, fontSize);
 	const char* cText = text.c_str();
 	
@@ -62,7 +63,7 @@ void Elements::SimpleTextField::CustomTextDraw(Vector2 origin){
 		DrawRectangle(origin.x + textOffsetX, origin.y + textOffsetY, 1, fontSize, BLACK);
 }
 
-int Elements::SimpleTextField::GetCursorIndex(Vector2 localMousePosition){
+int Elements::TextField::GetCursorIndex(Vector2 localMousePosition){
 	Font font = FontManager::GetFont(fontType, fontSize);
 	const char* cText = text.c_str();
 
@@ -96,7 +97,7 @@ int Elements::SimpleTextField::GetCursorIndex(Vector2 localMousePosition){
             if ((codepoint != ' ') && (codepoint != '\t'))
             {
 				Vector2 charPosition = { textOffsetX, textOffsetY };
-				if (charPosition.x + xToAdd > localMousePosition.x && charPosition.y < localMousePosition.y && charPosition.y + fontSize > localMousePosition.y)
+				if (charPosition.x + xToAdd / 2 > localMousePosition.x && charPosition.y < localMousePosition.y && charPosition.y + fontSize > localMousePosition.y)
 					return curIndex;
 
 				curIndex++; // idk if this should be here or before, but whatever...
@@ -112,7 +113,7 @@ int Elements::SimpleTextField::GetCursorIndex(Vector2 localMousePosition){
 	return text.size(); // or -1 idk yet
 }
 
-void Elements::SimpleTextField::Update(){
+void Elements::TextField::Update(){
 	if (selectedElement == this){
 		int key = GetCharPressed();
 
@@ -120,8 +121,18 @@ void Elements::SimpleTextField::Update(){
 		{
 			if ((key >= 32) && (key <= 125))
 			{
-				text.insert(text.begin()+cursorPosition, (char)key);
-				cursorPosition++;
+				Font font = FontManager::GetFont(fontType, fontSize);
+    			char *charPointer = (char *)malloc(2 * sizeof(char));
+    			charPointer[0] = (char)key;
+				charPointer[1] = '\0';
+
+				std::cout << MeasureTextEx(font, text.c_str(), fontSize, spacing).x << " - " << MeasureTextEx(font, charPointer, fontSize, spacing).x << std::endl;
+
+				if (MeasureTextEx(font, text.c_str(), fontSize, spacing).x + MeasureTextEx(font, charPointer, fontSize, spacing).x <= size.x){
+					// only insert if it dosent go out of bounds...
+					text.insert(text.begin()+cursorPosition, (char)key);
+					cursorPosition++;
+				}
 			}
 
 			key = GetCharPressed();
@@ -151,7 +162,7 @@ void Elements::SimpleTextField::Update(){
 	}
 }
 
-void Elements::SimpleTextField::MousePressed(Vector2 pos) {
+void Elements::TextField::MousePressed(Vector2 pos) {
 	std::cout << "test char pos thingy: " << GetCursorIndex(pos) << std::endl;
 	cursorPosition = GetCursorIndex(pos);
 	selectedElement = this;
