@@ -35,11 +35,15 @@ struct TabSettings {
 	// something about spacing?
 };
 
+struct NoteManagerSettings {
+};
+
 struct Settings {
 	bool editMode = false;
 	std::string defaultFontType = "Vera";
 
 	TabSettings tabSettings{};
+	//NoteManagerSettings noteManagerSettings{};
 
 	std::map<std::string, std::shared_ptr<SettingValueBase>> mappedSettings{};
 

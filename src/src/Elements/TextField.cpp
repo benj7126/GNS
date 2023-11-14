@@ -7,6 +7,7 @@
 void Elements::TextField::Draw(Vector2 offset) {
 	// std::cout << offset.x + position.x << offset.y + position.y << size.x << size.y << std::endl;
 	// std::cout << textFont << std::endl;
+	
 	Font font = FontManager::GetFont(fontType, fontSize);
 	
 	size.y = fontSize; // might want to set this when you change size instead, as to make it constant somehow...
