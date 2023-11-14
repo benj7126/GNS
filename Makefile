@@ -33,7 +33,7 @@ default: debug
 SRCS := $(shell find $(SRC_DIRS) -name '*.cpp' -or -name '*.c' -or -name '*.s')
 RELEASE_OBJS := $(SRCS:%=$(BUILD_DIR)/release/%.o)
 DEBUG_OBJS   := $(SRCS:%=$(BUILD_DIR)/debug/%.o)
-DEPS := $(OBJS:.o=.d)
+DEPS := $(RELEASE_OBJS:.o=.d) $(DEBUG_OBJS:.o=.d)
 
 INC_DIRS := $(shell find $(INC_DIR) -type d)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
