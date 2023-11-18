@@ -34,6 +34,34 @@ namespace Workspaces {
 			testNote.note.get()->elements.push_back(TF);
 
 			notes.push_back(testNote);
+			
+			
+			NoteWithPosition testNote2{ std::make_shared<Note>(), {300, 0} };
+
+			testNote2.note.get()->size = {250, 50};
+
+			std::shared_ptr<Elements::TextField> TF2 = std::make_shared<Elements::TextField>();
+			
+			TF2->size = {160, 45};
+			TF2->wrapping = 1;
+
+			testNote2.note.get()->elements.push_back(TF2);
+
+			notes.push_back(testNote2);
+			
+			
+			NoteWithPosition testNote3{ std::make_shared<Note>(), {600, 0} };
+
+			testNote3.note.get()->size = {250, 50};
+
+			std::shared_ptr<Elements::TextField> TF3 = std::make_shared<Elements::TextField>();
+			
+			TF3->size = {160, 45};
+			TF3->wrapping = 2;
+
+			testNote3.note.get()->elements.push_back(TF3);
+
+			notes.push_back(testNote3);
 		}
 	};
 }
