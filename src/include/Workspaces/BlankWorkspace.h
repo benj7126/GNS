@@ -29,7 +29,7 @@ namespace Workspaces {
 
 			std::shared_ptr<Elements::TextField> TF = std::make_shared<Elements::TextField>();
 			
-			TF->size = {160, 0};
+			TF->size = {160, 45};
 
 			testNote.note.get()->elements.push_back(TF);
 

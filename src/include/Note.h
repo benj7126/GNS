@@ -14,7 +14,7 @@ public:
 	std::vector<std::shared_ptr<Element>> elements;
 
 	virtual void Draw(Vector2 position) {
-		DrawRectangle(position.x, position.y, size.x, size.y, WHITE);
+		DrawRectangle(position.x, position.y, size.x, size.y, WHITE); // might want this to be an element idk yet...
 		DrawRectangleLines(position.x, position.y, size.x, size.y, BLACK);
 
 		for (std::shared_ptr<Element> e : elements) {
