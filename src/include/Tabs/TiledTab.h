@@ -43,11 +43,13 @@ public:
 	void Draw(int x, int y, int w, int h){
 		if (isAPair){
 			if (horizontal){
-				tp1->Draw(x, y, w * parting, h);
-				tp2->Draw(x + w*parting, y, w * (1-parting), h);
+				int partingWidth = w * parting;
+				tp1->Draw(x, y, partingWidth, h);
+				tp2->Draw(x + partingWidth, y, w  - partingWidth, h);
 			} else {
-				tp1->Draw(x, y, w, h * parting);
-				tp2->Draw(x, y + h*parting, w, h * (1-parting));
+				int partingHeight = h * parting;
+				tp1->Draw(x, y, w, partingHeight);
+				tp2->Draw(x, y + partingHeight, w, h - partingHeight);
 			}
 		} else {
 			BeginScissorMode(x, y, w, h);
@@ -73,11 +75,13 @@ public:
 
 		if (isAPair){
 			if (horizontal){
-				tp1->MousePressed(x, y, w * parting, h, mx, my);
-				tp2->MousePressed(x + w*parting, y, w * (1-parting), h, mx, my);
+				int partingWidth = w * parting;
+				tp1->MousePressed(x, y, partingWidth, h, mx, my);
+				tp2->MousePressed(x + partingWidth, y, w - partingWidth, h, mx, my);
 			} else {
-				tp1->MousePressed(x, y, w, h * parting, mx, my);
-				tp2->MousePressed(x, y + h*parting, w, h * (1-parting), mx, my);
+				int partingHeight = h * parting;
+				tp1->MousePressed(x, y, w, partingHeight, mx, my);
+				tp2->MousePressed(x, y + partingHeight, w, h - partingHeight, mx, my);
 			}
 		} else {
 			tile->MousePressed(mx - x, my - y);

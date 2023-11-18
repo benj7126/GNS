@@ -13,7 +13,7 @@ void Elements::TextField::Draw(Vector2 offset) {
 	size.y = fontSize; // might want to set this when you change size instead, as to make it constant somehow...
 	DrawRectangle(offset.x + position.x, offset.y + position.y, size.x, size.y, ORANGE); // size is {0, 0}...
 	
-	CustomTextDraw({offset.x + position.x, offset.y + position.y}); 
+	CustomTextDraw({offset.x + position.x, offset.y + position.y});
 }
 
 void Elements::TextField::CustomTextDraw(Vector2 origin){
