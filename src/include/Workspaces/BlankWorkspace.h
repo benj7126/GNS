@@ -25,11 +25,11 @@ namespace Workspaces {
 		void TestAddNote() {
 			NoteWithPosition testNote{ std::make_shared<Note>(), {0, 0} };
 
-			testNote.note.get()->size = {250, 50};
+			testNote.note.get()->size = {250, 80};
 
 			std::shared_ptr<Elements::TextField> TF = std::make_shared<Elements::TextField>();
 			
-			TF->size = {160, 45};
+			TF->size = {160, 80};
 
 			testNote.note.get()->elements.push_back(TF);
 
@@ -38,11 +38,11 @@ namespace Workspaces {
 			
 			NoteWithPosition testNote2{ std::make_shared<Note>(), {300, 0} };
 
-			testNote2.note.get()->size = {250, 50};
+			testNote2.note.get()->size = {250, 80};
 
 			std::shared_ptr<Elements::TextField> TF2 = std::make_shared<Elements::TextField>();
 			
-			TF2->size = {160, 45};
+			TF2->size = {160, 80};
 			TF2->wrapping = 1;
 
 			testNote2.note.get()->elements.push_back(TF2);
@@ -52,11 +52,11 @@ namespace Workspaces {
 			
 			NoteWithPosition testNote3{ std::make_shared<Note>(), {600, 0} };
 
-			testNote3.note.get()->size = {250, 50};
+			testNote3.note.get()->size = {250, 80};
 
 			std::shared_ptr<Elements::TextField> TF3 = std::make_shared<Elements::TextField>();
 			
-			TF3->size = {160, 45};
+			TF3->size = {160, 80};
 			TF3->wrapping = 2;
 
 			testNote3.note.get()->elements.push_back(TF3);

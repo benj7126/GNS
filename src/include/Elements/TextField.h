@@ -8,7 +8,7 @@
 namespace Elements { // managing note types
 	class TextField : public Element {
 	protected:
-		// std::string text = "";
+		std::string text = "";
 		int cursorPosition = 0;
 
 		int fontSize = 16;
@@ -19,6 +19,8 @@ namespace Elements { // managing note types
 
 		Color textColor = BLACK;
 		Color backgroundColor = WHITE;
+
+		bool charWrapNextLine = false;
 
 		/* dont know if its possible
 		int paddingUp = 5;
@@ -40,9 +42,10 @@ namespace Elements { // managing note types
 
 		int GetCursorIndex(Vector2 localMousePosition);
 		void DrawCodepointAt(Vector2 position, std::vector<int> codepointBuffer, int& curIndex, float &textOffsetX, float textOffsetY, bool &didDrawCursor);
+		int ScanCodepointsAt(Vector2 localMousePosition, std::vector<int> codepointBuffer, int& curIndex, float &textOffsetX, float textOffsetY);
 		void CustomTextDraw(Vector2 origin);
 		float MeasureTextHeightWithChar(char extraChar);
 
-		int wrapping = 0; // 0: char 1: word | 2: none |
+		int wrapping = 0; // 0: char 1: word | 2: none - needs to be private; public for testing
 	};
 }
