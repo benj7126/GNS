@@ -35,9 +35,14 @@ void ApplicationManager::Draw() {
 }
 
 void ApplicationManager::Update() {
-	// TextInputHandler::Update();
-	
-	tabs[curTap].get()->Update();
+	Vector2 mouse = GetMousePosition();
+	Vector2 xAndHeight{ 0, 0 };
+
+	for (std::shared_ptr<Tab> tab : tabs) {
+		xAndHeight = tab->CalculateTab(xAndHeight);
+	}
+
+	tabs[curTap].get()->Update(mouse.x, mouse.y - xAndHeight.y);
 
 	if (IsMouseButtonPressed(0)) {
 		// reset ~input~ well, selected now
@@ -47,10 +52,8 @@ void ApplicationManager::Update() {
 		bool allowWokspacePress = true;
 
 		// update tabs
-		Vector2 xAndHeight{ 0, 0 };
+		xAndHeight = { 0, 0 };
 		int tapIDX = 0;
-
-		Vector2 mouse = GetMousePosition();
 
 		for (std::shared_ptr<Tab> tab : tabs) {
 			int lastX = xAndHeight.x;
@@ -71,4 +74,5 @@ void ApplicationManager::Update() {
 			tabs[curTap].get()->MousePressed(mouse.x, mouse.y - xAndHeight.y);
 		}
 	}
+	// TextInputHandler::Update();
 }

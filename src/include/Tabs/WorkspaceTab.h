@@ -15,7 +15,7 @@ namespace Tabs {
 		WorkspaceTab();
 
 		void Draw(int x, int y, int w, int h) override;
-		void Update() override;
+		void Update(int x, int y) override;
 		void MousePressed(int x, int y) override;
 	};
 }

@@ -58,6 +58,6 @@ namespace Tabs {
 		static Settings settings;
 
 		void Draw(int x, int y, int w, int h) override {}
-		void Update() override;
+		void Update(int x, int y) override;
 	};
 }

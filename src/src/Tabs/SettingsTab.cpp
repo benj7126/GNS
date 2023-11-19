@@ -24,4 +24,4 @@ Tabs::SettingsTab::SettingsTab() {
 	//*((SettingValue<int>*)((SettingStructValue*)settings.mappedSettings["TabSettings"].get())->subSettings["fontSize"].get())->object = 100;
 }
 
-void Tabs::SettingsTab::Update() {}
+void Tabs::SettingsTab::Update(int x, int y) {}

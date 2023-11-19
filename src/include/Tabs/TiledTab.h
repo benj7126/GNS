@@ -9,6 +9,9 @@
 #include <memory>
 
 struct TilePair{
+private:
+	bool grabbed = false;
+
 public:
 	std::shared_ptr<Tile> tile;
 	std::shared_ptr<TilePair> tp1;
@@ -60,10 +63,43 @@ public:
 		}
 	}
 
-	void Update(){
+	void Update(int x, int y, int w, int h, int mx, int my){
 		if (isAPair){
-			tp1->Update();
-			tp2->Update();
+			if (grabbed){
+				if (IsMouseButtonReleased(0)){
+					grabbed = false;
+				} else {
+					if (horizontal){
+						float nParting = (float)mx / (float)w;
+						if (nParting < 0.2)
+							nParting = 0.2;
+
+						if (nParting > 0.8)
+							nParting = 0.8;
+
+						parting = nParting;
+					} else {
+						float nParting = (float)my / (float)h;
+						if (nParting < 0.2)
+							nParting = 0.2;
+
+						if (nParting > 0.8)
+							nParting = 0.8;
+
+						parting = nParting;
+					}
+				}
+			}
+
+			if (horizontal){
+				int partingWidth = w * parting;
+				tp1->Update(x, y, partingWidth, h, mx, my);
+				tp2->Update(x + partingWidth, y, w  - partingWidth, h, mx, my);
+			} else {
+				int partingHeight = h * parting;
+				tp1->Update(x, y, w, partingHeight, mx, my);
+				tp2->Update(x, y + partingHeight, w, h - partingHeight, mx, my);
+			}
 		} else {
 			tile->Update();
 		}
@@ -76,15 +112,35 @@ public:
 		if (isAPair){
 			if (horizontal){
 				int partingWidth = w * parting;
+				
+				if (-10 < x + partingWidth - mx && x + partingWidth - mx < 10){
+					grabbed = true;
+					return;
+				}
+
 				tp1->MousePressed(x, y, partingWidth, h, mx, my);
 				tp2->MousePressed(x + partingWidth, y, w - partingWidth, h, mx, my);
 			} else {
 				int partingHeight = h * parting;
+
+				if (-10 < y + partingHeight - my && y + partingHeight - my < 10){
+					grabbed = true;
+					return;
+				}
+
 				tp1->MousePressed(x, y, w, partingHeight, mx, my);
 				tp2->MousePressed(x, y + partingHeight, w, h - partingHeight, mx, my);
 			}
 		} else {
 			tile->MousePressed(mx - x, my - y);
+		}
+	}
+
+	void UnGrab(){
+		if (isAPair){
+			grabbed = false;
+			tp1->UnGrab();
+			tp2->UnGrab();
 		}
 	}
 };
@@ -105,10 +161,13 @@ public:
 
 		tile.Draw(x, y, w, h);
 	};
-	void Update() override {
-		tile.Update();
+
+	void Update(int x, int y) override {
+		tile.Update(lastX, lastY, lastW, lastH, x, y);
 	};
+
 	void MousePressed(int x, int y) override {
+		tile.UnGrab();
 		tile.MousePressed(lastX, lastY, lastW, lastH, x, y);
 	}
 };

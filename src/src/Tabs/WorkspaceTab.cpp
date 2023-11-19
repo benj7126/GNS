@@ -16,7 +16,7 @@ void Tabs::WorkspaceTab::MousePressed(int x, int y) {
 	}
 }
 
-void Tabs::WorkspaceTab::Update() {
+void Tabs::WorkspaceTab::Update(int x, int y) {
 	if (workspace == nullptr) {
 		// should probably default to a workspace type that lets the user pick what workspace to use...
 		workspace = std::make_shared<Workspaces::BlankWorkspace>();
