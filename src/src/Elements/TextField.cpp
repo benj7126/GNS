@@ -5,6 +5,8 @@
 #include <iostream>
 #include <vector>
 
+#include "KeyInput.h"
+
 void Elements::TextField::InternalDraw(Vector2 offset) {
 	// std::cout << offset.x + position.x << offset.y + position.y << size.x << size.y << std::endl;
 	// std::cout << textFont << std::endl;
@@ -18,13 +20,15 @@ void Elements::TextField::InternalDraw(Vector2 offset) {
 }
 
 void Elements::TextField::MousePressed(Vector2 pos) {
-	std::cout << "test char pos thingy: " << GetCursorIndex(pos) << std::endl;
+	std::cout << "test char pos thingy: " << pos.x << ", " << pos.y << std::endl;
 	cursorPosition = GetCursorIndex(pos);
 	selectedElement = this;
 	// TextInputHandler::LinkForInput(&text);
 }
 
 void Elements::TextField::Update(){
+	int prevCursorPosition = cursorPosition;
+
 	if (selectedElement == this){
 		int key = GetCharPressed();
 
@@ -42,7 +46,7 @@ void Elements::TextField::Update(){
 			key = GetCharPressed();
 		}
 
-		if (IsKeyPressed(KEY_BACKSPACE))
+		if (KeyInput::KeyActive(KEY_BACKSPACE))
 		{
 			if (cursorPosition != 0){
 				text.erase(text.begin() + cursorPosition-1);
@@ -50,7 +54,7 @@ void Elements::TextField::Update(){
 			}
 		}
 
-		if (IsKeyPressed(KEY_DELETE))
+		if (KeyInput::KeyActive(KEY_DELETE))
 		{
 			if (cursorPosition != text.size()){
 				text.erase(text.begin() + cursorPosition);
@@ -58,7 +62,7 @@ void Elements::TextField::Update(){
 			}
 		}
 
-		if (IsKeyPressed(KEY_ENTER))
+		if (KeyInput::KeyActive(KEY_ENTER))
 		{
 			float nHeight = MeasureTextHeightWithChar('\n');
 			if (nHeight <= size.y) {
@@ -67,14 +71,104 @@ void Elements::TextField::Update(){
 			}
 		}
 
-		if (IsKeyPressed(KEY_LEFT))
-			cursorPosition = cursorPosition == 0 ? 0 : cursorPosition-1;
+		if (KeyInput::KeyActive(KEY_LEFT) && cursorPosition != 0){
+			if (IsKeyDown(KEY_RIGHT_CONTROL) || IsKeyDown(KEY_LEFT_CONTROL)){
+				char startChar = text.at(cursorPosition - 1);
+				if (startChar == '\n'){
+					cursorPosition--;
+				} else {
+					bool onWord = (startChar == ' ') ? false : true;
 
-		if (IsKeyPressed(KEY_RIGHT))
-			cursorPosition = cursorPosition == text.size() ? text.size() : cursorPosition+1;
+					while (true){
+						if (cursorPosition <= 1) {
+							cursorPosition = 0;
+							break;
+						}
+
+						cursorPosition--;
+
+						char CurChar = text.at(cursorPosition - 1);
+						if (CurChar == ' ' || CurChar == '\n'){
+							if (onWord || CurChar == '\n')
+								break;
+						} else {
+							onWord = true;
+						}
+					}
+				}
+			} else {
+				cursorPosition--;
+			}
+		}
+
+		if (KeyInput::KeyActive(KEY_RIGHT) && cursorPosition != text.size()){
+			if (IsKeyDown(KEY_RIGHT_CONTROL) || IsKeyDown(KEY_LEFT_CONTROL)){
+				char startChar = text.at(cursorPosition);
+				if (startChar == '\n'){
+					cursorPosition++;
+				} else {
+					bool onWord = (startChar == ' ') ? false : true;
+
+					while (true) {
+						if (cursorPosition >= text.size() - 1) { // maby -1?
+							cursorPosition = text.size();
+							break;
+						}
+
+						cursorPosition++;
+
+						char CurChar = text.at(cursorPosition);
+						if (CurChar == ' ' || CurChar == '\n'){
+							if (onWord || CurChar == '\n')
+								break;
+						} else {
+							onWord = true;
+						}
+					}
+				}
+			} else {
+				cursorPosition++;
+			}
+		}
+
+		if (prevCursorPosition != cursorPosition){
+			savedX = -1;
+		}
+
+		if (KeyInput::KeyActive(KEY_UP)){
+			if (savedX == -1){
+				savedX = curX;
+				savedY = curY;
+			}
+			
+			if (savedY > 0){
+				savedY -= textLineSpacing;
+
+				if (savedY < 0)
+					cursorPosition = 0;
+				else
+					cursorPosition = GetCursorIndex({savedX, savedY});
+				
+			}
+		}
+
+		if (KeyInput::KeyActive(KEY_DOWN)){
+			if (savedX == -1){
+				savedX = curX;
+				savedY = curY;
+			}
+
+			savedY += textLineSpacing;
+			
+			int nCursorPos = GetCursorIndex({savedX, savedY});
+
+			if (nCursorPos == cursorPosition){
+				savedY -= textLineSpacing;
+			}
+
+			cursorPosition = nCursorPos;
+		}
 	}
-	
-	// std::cout << MeasureTextWithChar('a').x << " - " << MeasureTextWithChar('a').y << std::endl;
 }
 
 
@@ -92,6 +186,8 @@ void Elements::TextField::DrawCodepointAt(Vector2 origin, std::vector<int> codep
 			if (curIndex == cursorPosition && !didDrawCursor){
 				didDrawCursor = true;
 				DrawRectangle(origin.x + textOffsetX, origin.y + textOffsetY, 1, fontSize, BLACK);
+				curX = textOffsetX;
+				curY = textOffsetY + fontSize / 2;
 			}
 
 			curIndex++; // idk if this should be here or before, but whatever...
@@ -147,6 +243,8 @@ void Elements::TextField::CustomTextDraw(Vector2 origin) {
 			if (curIndex == cursorPosition && !didDrawCursor){
 				didDrawCursor = true;
 				DrawRectangle(origin.x + textOffsetX, origin.y + textOffsetY, 1, fontSize, BLACK);
+				curX = textOffsetX;
+				curY = textOffsetY + fontSize / 2;
 			}
 			curIndex++;
 
@@ -179,6 +277,8 @@ void Elements::TextField::CustomTextDraw(Vector2 origin) {
 							if (curIndex == cursorPosition && !didDrawCursor){
 								didDrawCursor = true;
 								DrawRectangle(origin.x + textOffsetX, origin.y + textOffsetY, 1, fontSize, BLACK);
+								curX = textOffsetX;
+								curY = textOffsetY + fontSize / 2;
 							}
 						}
 						
@@ -199,8 +299,11 @@ void Elements::TextField::CustomTextDraw(Vector2 origin) {
         i += codepointByteCount;   // Move text bytes counter to next codepoint
     }
 
-	if (!didDrawCursor)
+	if (!didDrawCursor){
 		DrawRectangle(origin.x + textOffsetX, origin.y + textOffsetY, 1, fontSize, BLACK);
+		curX = textOffsetX;
+		curY = textOffsetY + fontSize / 2;
+	}
 
 	// std::cout << " f: " << curLineWidth + codepointBufferWidth << " - " << this->size.x << std::endl;
 }
@@ -290,7 +393,7 @@ int Elements::TextField::ScanCodepointsAt(Vector2 localMousePosition, std::vecto
 			int index = GetGlyphIndex(font, cp);
 			float codepointWidth = (font.glyphs[index].advanceX == 0 ? (float)font.recs[index].width : (float)font.glyphs[index].advanceX) + spacing;
 
-			if (textOffsetX - codepointWidth/2 <= localMousePosition.x && textOffsetX - codepointWidth/2 + codepointWidth >= localMousePosition.x && textOffsetY <= localMousePosition.y && textOffsetY + fontSize >= localMousePosition.y){
+			if (textOffsetX - codepointWidth/2 + codepointWidth >= localMousePosition.x && textOffsetY <= localMousePosition.y && textOffsetY + fontSize >= localMousePosition.y){
 				return curIndex;
 			}
 

@@ -22,6 +22,11 @@ namespace Elements { // managing note types
 
 		bool charWrapNextLine = false;
 
+		float curX = 0;
+		float curY = 0;
+		float savedX = -1;
+		float savedY = -1;
+
 		/* dont know if its possible
 		int paddingUp = 5;
 		int paddingDown = 5;

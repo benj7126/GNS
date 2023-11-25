@@ -4,6 +4,10 @@
 #include "Tabs/NoteManagerTap.h"
 #include "Tabs/SettingsTab.h"
 
+#include "KeyInput.h"
+int KeyInput::curKey = -1;
+float KeyInput::updateCooldown = 0;
+
 #include <memory>
 #include <raylib.h>
 
@@ -35,6 +39,8 @@ void ApplicationManager::Draw() {
 }
 
 void ApplicationManager::Update() {
+	KeyInput::UpdateKeyInput();
+
 	Vector2 mouse = GetMousePosition();
 	Vector2 xAndHeight{ 0, 0 };
 
