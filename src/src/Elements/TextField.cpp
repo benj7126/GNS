@@ -26,6 +26,10 @@ void Elements::TextField::MousePressed(Vector2 pos) {
 	// TextInputHandler::LinkForInput(&text);
 }
 
+bool StopChar(char c){
+	return c == ' ' || c == '\n' || c == '.' || c == ',';
+}
+
 void Elements::TextField::Update(){
 	int prevCursorPosition = cursorPosition;
 
@@ -49,16 +53,61 @@ void Elements::TextField::Update(){
 		if (KeyInput::KeyActive(KEY_BACKSPACE))
 		{
 			if (cursorPosition != 0){
-				text.erase(text.begin() + cursorPosition-1);
-				cursorPosition--;
+				if (IsKeyDown(KEY_RIGHT_CONTROL) || IsKeyDown(KEY_LEFT_CONTROL)){
+					char curChar = text.at(cursorPosition - 1);
+					if (curChar == '\n'){
+						text.erase(text.begin() + cursorPosition-1);
+						cursorPosition--;
+					}else{
+						while (cursorPosition != 0){
+							char nextChar = text.at(cursorPosition - 1);
+
+							std::cout << "t" << std::endl;
+
+							if (!StopChar(curChar) && StopChar(nextChar)){
+								break;
+							}
+
+							std::cout << "t2" << std::endl;
+
+							text.erase(text.begin() + cursorPosition-1);
+							cursorPosition--;
+
+							curChar = nextChar;
+
+							std::cout << "t3" << std::endl;
+						}
+					}
+				}else{
+					text.erase(text.begin() + cursorPosition-1);
+					cursorPosition--;
+				}
 			}
 		}
 
 		if (KeyInput::KeyActive(KEY_DELETE))
 		{
 			if (cursorPosition != text.size()){
-				text.erase(text.begin() + cursorPosition);
-				cursorPosition;
+				if (IsKeyDown(KEY_RIGHT_CONTROL) || IsKeyDown(KEY_LEFT_CONTROL)){
+					char curChar = text.at(cursorPosition);
+					if (curChar == '\n'){
+						text.erase(text.begin() + cursorPosition);
+					}else{
+						while (cursorPosition != text.size()){
+							char nextChar = text.at(cursorPosition);
+
+							if ((StopChar(curChar) && !StopChar(nextChar)) || nextChar == '\n'){
+								break;
+							}
+
+							text.erase(text.begin() + cursorPosition);
+
+							curChar = nextChar;
+						}
+					}
+				}else{
+					text.erase(text.begin() + cursorPosition);
+				}
 			}
 		}
 
@@ -77,23 +126,17 @@ void Elements::TextField::Update(){
 				if (startChar == '\n'){
 					cursorPosition--;
 				} else {
-					bool onWord = (startChar == ' ') ? false : true;
+					char curChar = text.at(cursorPosition-1);
 
-					while (true){
-						if (cursorPosition <= 1) {
-							cursorPosition = 0;
+					while (cursorPosition != 0){
+						char nextChar = text.at(cursorPosition-1);
+
+						if (!StopChar(curChar) && StopChar(nextChar)){
 							break;
 						}
 
 						cursorPosition--;
-
-						char CurChar = text.at(cursorPosition - 1);
-						if (CurChar == ' ' || CurChar == '\n'){
-							if (onWord || CurChar == '\n')
-								break;
-						} else {
-							onWord = true;
-						}
+						curChar = nextChar;
 					}
 				}
 			} else {
@@ -107,23 +150,17 @@ void Elements::TextField::Update(){
 				if (startChar == '\n'){
 					cursorPosition++;
 				} else {
-					bool onWord = (startChar == ' ') ? false : true;
+					char curChar = text.at(cursorPosition);
 
-					while (true) {
-						if (cursorPosition >= text.size() - 1) { // maby -1?
-							cursorPosition = text.size();
+					while (cursorPosition != text.size()){
+						char nextChar = text.at(cursorPosition);
+
+						if ((StopChar(curChar) && !StopChar(nextChar)) || nextChar == '\n'){
 							break;
 						}
 
 						cursorPosition++;
-
-						char CurChar = text.at(cursorPosition);
-						if (CurChar == ' ' || CurChar == '\n'){
-							if (onWord || CurChar == '\n')
-								break;
-						} else {
-							onWord = true;
-						}
+						curChar = nextChar;
 					}
 				}
 			} else {
@@ -140,16 +177,16 @@ void Elements::TextField::Update(){
 				savedX = curX;
 				savedY = curY;
 			}
-			
-			if (savedY > 0){
-				savedY -= textLineSpacing;
 
-				if (savedY < 0)
-					cursorPosition = 0;
-				else
-					cursorPosition = GetCursorIndex({savedX, savedY});
-				
-			}
+			float futureSavedY = savedY - textLineSpacing;
+			
+			if (futureSavedY > 0)
+				savedY = futureSavedY;
+
+			if (futureSavedY < 0)
+				cursorPosition = 0;
+			else
+				cursorPosition = GetCursorIndex({savedX, savedY});
 		}
 
 		if (KeyInput::KeyActive(KEY_DOWN)){
@@ -158,15 +195,14 @@ void Elements::TextField::Update(){
 				savedY = curY;
 			}
 
-			savedY += textLineSpacing;
-			
-			int nCursorPos = GetCursorIndex({savedX, savedY});
-
-			if (nCursorPos == cursorPosition){
-				savedY -= textLineSpacing;
+			if (cursorPosition != text.size()){
+				savedY += textLineSpacing;
+				
+				cursorPosition = GetCursorIndex({savedX, savedY});
+				
+				if (cursorPosition == text.size())
+					savedY -= textLineSpacing;
 			}
-
-			cursorPosition = nCursorPos;
 		}
 	}
 }
