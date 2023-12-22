@@ -198,13 +198,11 @@ void Elements::TextField::Update(){
 			cursorPosition = GetCursorIndex({savedX, savedY});
 			
 			if (savedX > curX){
-				std::cout<<"a"<<std::endl;
 				if (cursorPosition == prevSavedCursor){
 					savedY -= textLineSpacing;
 					savedX = curX;
 				}
 			} else {
-				std::cout<<"b"<<std::endl;
 				if (cursorPosition == text.size()){
 					savedY -= textLineSpacing;
 					savedX = curX;
@@ -228,8 +226,9 @@ void Elements::TextField::DrawCodepointAt(Vector2 origin, std::vector<int> codep
 
 			if (curIndex == cursorPosition && !didDrawCursor){
 				didDrawCursor = true;
-				DrawRectangle(origin.x + textOffsetX, origin.y + textOffsetY, 1, fontSize, BLACK);
-				curX = textOffsetX;
+				int effectiveX = origin.x + (textOffsetX > this->size.x-1 ? this->size.x-1 : textOffsetX);
+				DrawRectangle(effectiveX, origin.y + textOffsetY, 1, fontSize, BLACK);
+				curX = effectiveX;
 				curY = textOffsetY + fontSize / 2;
 			}
 
@@ -285,8 +284,9 @@ void Elements::TextField::CustomTextDraw(Vector2 origin) {
             // NOTE: Line spacing is a global variable, use SetTextLineSpacing() to setup
 			if (curIndex == cursorPosition && !didDrawCursor){
 				didDrawCursor = true;
-				DrawRectangle(origin.x + textOffsetX, origin.y + textOffsetY, 1, fontSize, BLACK);
-				curX = textOffsetX;
+				int effectiveX = origin.x + (textOffsetX > this->size.x-1 ? this->size.x-1 : textOffsetX);
+				DrawRectangle(effectiveX, origin.y + textOffsetY, 1, fontSize, BLACK);
+				curX = effectiveX;
 				curY = textOffsetY + fontSize / 2;
 			}
 			curIndex++;
@@ -301,7 +301,12 @@ void Elements::TextField::CustomTextDraw(Vector2 origin) {
 			codepointBufferWidth += (font.glyphs[cpIndex].advanceX == 0 ? (float)font.recs[cpIndex].width : (float)font.glyphs[cpIndex].advanceX) + spacing;
 
 			if (codepoint == ' ' || codepoint == '\t' || wrapping == 0 || wrapping == 2 || i + 1 == size || curLineWidth + nextCharWidth + codepointBufferWidth > this->size.x) {
-				if (curLineWidth + nextCharWidth + codepointBufferWidth > this->size.x && wrapping != 2){
+			std::cout << curLineWidth + nextCharWidth + codepointBufferWidth << " > " << (this->size.x) << std::endl;
+				if (curLineWidth + nextCharWidth + codepointBufferWidth > this->size.x && wrapping != 2 && !(codepoint == ' ' || codepoint == '\t')){
+					i--;
+					codepointBuffer.pop_back();
+					
+					std::cout << "fg" << std::endl;
 					bool wasZero = curLineWidth == 0;
 					if ((wrapping == 1 && curLineWidth != 0) && textOffsetY + textLineSpacing + fontSize <= this->size.y) {
 						textOffsetY += textLineSpacing;
@@ -319,8 +324,9 @@ void Elements::TextField::CustomTextDraw(Vector2 origin) {
 						if (!charWrapNextLine){
 							if (curIndex == cursorPosition && !didDrawCursor){
 								didDrawCursor = true;
-								DrawRectangle(origin.x + textOffsetX, origin.y + textOffsetY, 1, fontSize, BLACK);
-								curX = textOffsetX;
+								int effectiveX = origin.x + (textOffsetX > this->size.x-1 ? this->size.x-1 : textOffsetX);
+								DrawRectangle(effectiveX, origin.y + textOffsetY, 1, fontSize, BLACK);
+								curX = effectiveX;
 								curY = textOffsetY + fontSize / 2;
 							}
 						}
@@ -343,8 +349,9 @@ void Elements::TextField::CustomTextDraw(Vector2 origin) {
     }
 
 	if (!didDrawCursor){
-		DrawRectangle(origin.x + textOffsetX, origin.y + textOffsetY, 1, fontSize, BLACK);
-		curX = textOffsetX;
+		int effectiveX = origin.x + (textOffsetX > this->size.x-1 ? this->size.x-1 : textOffsetX);
+		DrawRectangle(effectiveX, origin.y + textOffsetY, 1, fontSize, BLACK);
+		curX = effectiveX;
 		curY = textOffsetY + fontSize / 2;
 	}
 
@@ -397,7 +404,10 @@ float Elements::TextField::MeasureTextHeightWithChar(char extraChar){
 			codepointBufferWidth += (font.glyphs[cpIndex].advanceX == 0 ? (float)font.recs[cpIndex].width : (float)font.glyphs[cpIndex].advanceX) + spacing;
 
 			if (codepoint == ' ' || codepoint == '\t' || wrapping == 0 || wrapping == 2 || i + 1 == size || curLineWidth + nextCharWidth + codepointBufferWidth > this->size.x) {
-				if (curLineWidth + nextCharWidth + codepointBufferWidth > this->size.x && wrapping != 2){
+				if (curLineWidth + nextCharWidth + codepointBufferWidth > this->size.x && wrapping != 2 && !(codepoint == ' ' || codepoint == '\t')){
+					i--;
+					codepointBuffer.pop_back();
+
 					bool wasZero = curLineWidth == 0;
 					if ((wrapping == 1 && curLineWidth != 0) && textOffsetY + textLineSpacing + fontSize <= this->size.y) {
 						textOffsetY += textLineSpacing;
@@ -510,7 +520,10 @@ int Elements::TextField::GetCursorIndex(Vector2 localMousePosition) {
 			codepointBufferWidth += (font.glyphs[cpIndex].advanceX == 0 ? (float)font.recs[cpIndex].width : (float)font.glyphs[cpIndex].advanceX) + spacing;
 
 			if (codepoint == ' ' || codepoint == '\t' || wrapping == 0 || wrapping == 2 || i + 1 == size || curLineWidth + nextCharWidth + codepointBufferWidth > this->size.x) {
-				if (curLineWidth + nextCharWidth + codepointBufferWidth > this->size.x && wrapping != 2){
+				if (curLineWidth + nextCharWidth + codepointBufferWidth > this->size.x && wrapping != 2 && !(codepoint == ' ' || codepoint == '\t')){
+					i--;
+					codepointBuffer.pop_back();
+					
 					bool wasZero = curLineWidth == 0;
 					if ((wrapping == 1 && curLineWidth != 0) && textOffsetY + textLineSpacing + fontSize <= this->size.y) { // pressed at wrapped line
 						if (textOffsetY < localMousePosition.y && textOffsetY + fontSize > localMousePosition.y){
