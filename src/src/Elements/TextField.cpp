@@ -23,6 +23,7 @@ void Elements::TextField::MousePressed(Vector2 pos) {
 	std::cout << "test char pos thingy: " << pos.x << ", " << pos.y << std::endl;
 	cursorPosition = GetCursorIndex(pos);
 	selectedElement = this;
+	savedX = -1;
 	// TextInputHandler::LinkForInput(&text);
 }
 
@@ -45,7 +46,7 @@ void Elements::TextField::Update(){
 					text.insert(text.begin()+cursorPosition, (char)key);
 					cursorPosition++;
 				}
-			}
+			}	
 
 			key = GetCharPressed();
 		}
@@ -62,20 +63,14 @@ void Elements::TextField::Update(){
 						while (cursorPosition != 0){
 							char nextChar = text.at(cursorPosition - 1);
 
-							std::cout << "t" << std::endl;
-
 							if (!StopChar(curChar) && StopChar(nextChar)){
 								break;
 							}
-
-							std::cout << "t2" << std::endl;
 
 							text.erase(text.begin() + cursorPosition-1);
 							cursorPosition--;
 
 							curChar = nextChar;
-
-							std::cout << "t3" << std::endl;
 						}
 					}
 				}else{
@@ -183,8 +178,10 @@ void Elements::TextField::Update(){
 			if (futureSavedY > 0)
 				savedY = futureSavedY;
 
-			if (futureSavedY < 0)
+			if (futureSavedY < 0){
 				cursorPosition = 0;
+				savedX = 0;
+			}
 			else
 				cursorPosition = GetCursorIndex({savedX, savedY});
 		}
@@ -195,13 +192,23 @@ void Elements::TextField::Update(){
 				savedY = curY;
 			}
 
-			if (cursorPosition != text.size()){
-				savedY += textLineSpacing;
-				
-				cursorPosition = GetCursorIndex({savedX, savedY});
-				
-				if (cursorPosition == text.size())
+			int prevSavedCursor = cursorPosition;
+			savedY += textLineSpacing;
+			
+			cursorPosition = GetCursorIndex({savedX, savedY});
+			
+			if (savedX > curX){
+				std::cout<<"a"<<std::endl;
+				if (cursorPosition == prevSavedCursor){
 					savedY -= textLineSpacing;
+					savedX = curX;
+				}
+			} else {
+				std::cout<<"b"<<std::endl;
+				if (cursorPosition == text.size()){
+					savedY -= textLineSpacing;
+					savedX = curX;
+				}
 			}
 		}
 	}
@@ -429,7 +436,9 @@ int Elements::TextField::ScanCodepointsAt(Vector2 localMousePosition, std::vecto
 			int index = GetGlyphIndex(font, cp);
 			float codepointWidth = (font.glyphs[index].advanceX == 0 ? (float)font.recs[index].width : (float)font.glyphs[index].advanceX) + spacing;
 
-			if (textOffsetX - codepointWidth/2 + codepointWidth >= localMousePosition.x && textOffsetY <= localMousePosition.y && textOffsetY + fontSize >= localMousePosition.y){
+			if (textOffsetX + codepointWidth/2 >= localMousePosition.x && textOffsetY <= localMousePosition.y && textOffsetY + fontSize >= localMousePosition.y){
+				curX = textOffsetX;
+				curY = textOffsetY + fontSize / 2;
 				return curIndex;
 			}
 
@@ -549,6 +558,7 @@ int Elements::TextField::GetCursorIndex(Vector2 localMousePosition) {
         i += codepointByteCount;   // Move text bytes counter to next codepoint
     }
 
-
+	curX = textOffsetX;
+	curY = textOffsetY + fontSize / 2;
 	return text.size(); // or -1 idk yet
 }
