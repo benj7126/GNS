@@ -1,28 +1,10 @@
 #pragma once
 
 #include "Tab.h"
+#include "DataStruct.h"
 
 #include <optional>
 #include <string>
-#include <memory>
-#include <map>
-
-struct SettingValueBase {};
-
-template<typename T>
-struct SettingValue : public SettingValueBase {
-	std::string type;
-    T* object;
-
-    SettingValue(T* objectIn) {
-		object = objectIn;
-		type = typeid(T).name();
-    }
-};
-
-struct SettingStructValue : public SettingValueBase {
-	std::map<std::string, std::shared_ptr<SettingValueBase>> subSettings{};
-};
 
 struct TabSettings {
 	int fontSize = 24;
@@ -45,7 +27,7 @@ struct Settings {
 	TabSettings tabSettings{};
 	//NoteManagerSettings noteManagerSettings{};
 
-	std::map<std::string, std::shared_ptr<SettingValueBase>> mappedSettings{};
+	DataStructHolder settingHolder{};
 
 	Settings();
 };

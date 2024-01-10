@@ -7,15 +7,19 @@
 
 #include "KeyInput.h"
 
+DataStructBase Elements::TextField::GenerateDataStruct(){
+	DataStructHolder returnBase{};
+
+	// returnBase.subStruct.insert();
+	
+	returnBase.insert("Label", Elements::Interfaces::ILabel::GetDataStruct());
+
+	return returnBase;
+}
+
 void Elements::TextField::InternalDraw(Vector2 offset) {
-	// std::cout << offset.x + position.x << offset.y + position.y << size.x << size.y << std::endl;
-	// std::cout << textFont << std::endl;
-	
-	Font font = FontManager::GetFont(fontType, fontSize);
-	
-	// size.y = fontSize; // might want to set this when you change size instead, as to make it constant somehow...
 	DrawRectangle(offset.x + position.x, offset.y + position.y, size.x, size.y, ORANGE); // size is {0, 0}...
-	
+
 	CustomTextDraw({offset.x + position.x, offset.y + position.y});
 }
 

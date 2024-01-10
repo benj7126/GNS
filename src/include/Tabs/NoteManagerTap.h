@@ -12,12 +12,11 @@ struct NoteData{
 	std::vector<std::string> elements; // but their string forms ofc...
 };
 
-namespace Tabs { // managing note types
+namespace Tabs { // managing note types - theres only one of these...
 	class NoteManagerTap : public TiledTab {
-	private:
-		static std::unordered_map<std::string, NoteData> allNotes;
-
 	public:
+		static std::unordered_map<std::string, NoteData> allNotes;
+		static std::string editingElement;
 		NoteManagerTap();
 	};
 }

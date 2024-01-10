@@ -24,13 +24,19 @@ public:
 	//			  1: down
 	//			  2: left
 	//			  3: right
-	void split(bool _horizontal, float _parting, std::shared_ptr<Tile> newTile){
+	void split(bool _horizontal, float _parting, std::shared_ptr<Tile> newTile, bool flipped = false){
 		if (isAPair){
 			return;
 		}
 
-		tp1 = { std::make_shared<TilePair>(tile) };
-		tp2 = { std::make_shared<TilePair>(newTile) };
+		if (flipped){
+			tp2 = { std::make_shared<TilePair>(tile) };
+			tp1 = { std::make_shared<TilePair>(newTile) };
+		}else{
+			tp1 = { std::make_shared<TilePair>(tile) };
+			tp2 = { std::make_shared<TilePair>(newTile) };
+		}
+
 
 		tile = nullptr;
 
@@ -63,31 +69,57 @@ public:
 		}
 	}
 
+	float makeModification(float pOParting, float pNParting){
+		float nParting = parting * pOParting/pNParting;
+
+		if (tp1->isAPair && tp1->horizontal == horizontal){
+			nParting = tp1->makeModification(parting, nParting);
+		}
+		if (tp2->isAPair && tp2->horizontal == horizontal){
+			nParting = tp2->makeModification(parting, nParting);
+		}
+
+		if (nParting < 0.2){
+			nParting = 0.2;
+		} else if (nParting > 0.8){
+			nParting = 0.8;
+		}
+
+		float pParting = 1/((nParting/parting)/pOParting);
+
+		parting = nParting;
+
+		return pParting;
+	}
+
 	void Update(int x, int y, int w, int h, int mx, int my){
 		if (isAPair){
 			if (grabbed){
 				if (IsMouseButtonReleased(0)){
 					grabbed = false;
 				} else {
-					if (horizontal){
-						float nParting = (float)mx / (float)w;
-						if (nParting < 0.2)
-							nParting = 0.2;
+					float nParting = (float)mx / (float)w;
+					if (horizontal)
+						nParting = (float)mx / (float)w;
+					else
+						nParting = (float)my / (float)h;
 
-						if (nParting > 0.8)
-							nParting = 0.8;
+					if (nParting < 0.2)
+						nParting = 0.2;
 
-						parting = nParting;
-					} else {
-						float nParting = (float)my / (float)h;
-						if (nParting < 0.2)
-							nParting = 0.2;
+					if (nParting > 0.8)
+						nParting = 0.8;
 
-						if (nParting > 0.8)
-							nParting = 0.8;
-
-						parting = nParting;
+					if (parting != nParting){
+						if (tp1->isAPair && tp1->horizontal == horizontal){
+							nParting = tp1->makeModification(parting, nParting);
+						}
+						if (tp2->isAPair && tp2->horizontal == horizontal){
+							nParting = tp2->makeModification(parting, nParting);
+						}
 					}
+
+					parting = nParting;
 				}
 			}
 

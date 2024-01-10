@@ -1,26 +1,15 @@
 #pragma once
 
 #include "Element.h"
+#include "ILabel.h" 
 
 #include <string>
 #include <vector>
 
 namespace Elements { // managing note types
-	class TextField : public Element {
+	class TextField : public Element, public Elements::Interfaces::ILabel {
 	protected:
-		std::string text = "";
 		int cursorPosition = 0;
-
-		int fontSize = 16;
-		std::string fontType = "";
-
-		int textLineSpacing = 15;
-		int spacing = 0;
-
-		Color textColor = BLACK;
-		Color backgroundColor = WHITE;
-
-		bool charWrapNextLine = false;
 
 		float curX = 0;
 		float curY = 0;
@@ -37,6 +26,8 @@ namespace Elements { // managing note types
 		void InternalDraw(Vector2 offset);
 
 	public:
+		DataStructBase GenerateDataStruct() override;
+
 		void Draw(Vector2 offset) override{
 			BeginScissorMode(offset.x + position.x, offset.y + position.y, size.x, size.y);
 			InternalDraw(offset);

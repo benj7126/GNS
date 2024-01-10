@@ -1,0 +1,24 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-I./src/include",
+      "-I./src/include/Workspaces",
+      "-I./src/include/Elements",
+      "-I./src/include/Elements/Interfaces",
+      "-I./src/include/Tabs",
+      "-I./src/include/Tabs/NoteManagerTiles",
+      "-Wall",
+      "-Wextra",
+      "-g",
+      "-DDEBUG",
+      "-c",
+      "-o",
+      "build/debug/./src/src/ApplicationManager.cpp.o",
+      "src/src/ApplicationManager.cpp"
+    ],
+    "directory": "/home/catnull/Programming/Cpp/GNS",
+    "file": "/home/catnull/Programming/Cpp/GNS/src/src/ApplicationManager.cpp",
+    "output": "/home/catnull/Programming/Cpp/GNS/build/debug/src/src/ApplicationManager.cpp.o"
+  }
+]
