@@ -9,9 +9,11 @@ std::string Tabs::NoteManagerTap::editingElement = "";
 Tabs::NoteManagerTap::NoteManagerTap() {
 	Name = "Note Manager";
 
-	tile.split(true, 0.72, std::make_shared<Tabs::Tiles::ElementInspectorTile>());
-	tile.tp1 = std::make_shared<TilePair>(std::make_shared<Tabs::Tiles::ShowWindowTile>());
-	tile.tp1->split(true, 0.2, std::make_shared<Tabs::Tiles::ElementToolboxTile>(), true);
+	tile.split(true, {0.2, 0.8}, {
+		std::make_shared<Tabs::Tiles::ElementToolboxTile>(),
+		std::make_shared<Tabs::Tiles::ShowWindowTile>(),
+		std::make_shared<Tabs::Tiles::ElementInspectorTile>(),
+	});
 	// tile.tp1->split(false, 0.2, std::make_shared<Tabs::Tiles::EditWindowTile>());
 	// tile.tp1->tp2->split(true, 0.6, std::make_shared<Tabs::Tiles::EditWindowTile>());
 }

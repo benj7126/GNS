@@ -10,12 +10,11 @@
 
 struct TilePair{
 private:
-	bool grabbed = false;
+	int grabbed = -1;
 
 public:
 	std::shared_ptr<Tile> tile;
-	std::shared_ptr<TilePair> tp1;
-	std::shared_ptr<TilePair> tp2;
+	std::vector<std::shared_ptr<TilePair>> tps;
 
 	TilePair(std::shared_ptr<Tile> tile = std::make_shared<Tile>()) : tile{tile} {}
 
@@ -24,41 +23,45 @@ public:
 	//			  1: down
 	//			  2: left
 	//			  3: right
-	void split(bool _horizontal, float _parting, std::shared_ptr<Tile> newTile, bool flipped = false){
-		if (isAPair){
+	void split(bool _horizontal, std::vector<float> _partings, std::vector<std::shared_ptr<Tile>> tiles){
+		if (isAPair || _partings.size()+1 != tiles.size()){
+			std::cout << "either is not a pair or dosent have right amount of partings to tiles" << std::endl;
 			return;
 		}
-
-		if (flipped){
-			tp2 = { std::make_shared<TilePair>(tile) };
-			tp1 = { std::make_shared<TilePair>(newTile) };
-		}else{
-			tp1 = { std::make_shared<TilePair>(tile) };
-			tp2 = { std::make_shared<TilePair>(newTile) };
-		}
-
 
 		tile = nullptr;
 
 		horizontal = _horizontal;
-		parting = _parting;
+		partings = _partings;
+		for (auto &tile : tiles)
+			tps.push_back(std::make_shared<TilePair>(tile));
+
 		isAPair = true;
 	}
 
 	bool isAPair = false;
-	float parting = 0.5; // 0 to 1
+	std::vector<float> partings;
 	bool horizontal = true; // false = vertical | direction of parting
 
 	void Draw(int x, int y, int w, int h){
 		if (isAPair){
-			if (horizontal){
-				int partingWidth = w * parting;
-				tp1->Draw(x, y, partingWidth, h);
-				tp2->Draw(x + partingWidth, y, w  - partingWidth, h);
-			} else {
-				int partingHeight = h * parting;
-				tp1->Draw(x, y, w, partingHeight);
-				tp2->Draw(x, y + partingHeight, w, h - partingHeight);
+			float lastParting = 0;
+			for (int i = 0; i < tps.size(); i++){
+				float thisParting = 0;
+				if (i == tps.size()-1){
+					thisParting = 1 - lastParting;
+					if (thisParting < 0)
+						thisParting = 0;
+				} else {
+					thisParting = partings[i] - lastParting;
+				}
+				
+				if (horizontal){
+					tps[i]->Draw(x + lastParting * w, y, w * thisParting, h);
+				} else {
+					tps[i]->Draw(x, y + lastParting * h, w, h * thisParting);
+				}
+				lastParting += thisParting;
 			}
 		} else {
 			BeginScissorMode(x, y, w, h);
@@ -69,34 +72,11 @@ public:
 		}
 	}
 
-	float makeModification(float pOParting, float pNParting){
-		float nParting = parting * pOParting/pNParting;
-
-		if (tp1->isAPair && tp1->horizontal == horizontal){
-			nParting = tp1->makeModification(parting, nParting);
-		}
-		if (tp2->isAPair && tp2->horizontal == horizontal){
-			nParting = tp2->makeModification(parting, nParting);
-		}
-
-		if (nParting < 0.2){
-			nParting = 0.2;
-		} else if (nParting > 0.8){
-			nParting = 0.8;
-		}
-
-		float pParting = 1/((nParting/parting)/pOParting);
-
-		parting = nParting;
-
-		return pParting;
-	}
-
 	void Update(int x, int y, int w, int h, int mx, int my){
 		if (isAPair){
-			if (grabbed){
+			if (grabbed != -1){
 				if (IsMouseButtonReleased(0)){
-					grabbed = false;
+					grabbed = -1;
 				} else {
 					float nParting = (float)mx / (float)w;
 					if (horizontal)
@@ -104,33 +84,38 @@ public:
 					else
 						nParting = (float)my / (float)h;
 
-					if (nParting < 0.2)
-						nParting = 0.2;
+					// instead of 0.2, make it dynamically calculate the minimum pixel size, and then make it fit.
 
-					if (nParting > 0.8)
-						nParting = 0.8;
+					float prevParting = (grabbed-1 < 0 ? 0 : partings[grabbed-1]);
+					if (nParting - prevParting < 0.2)
+						nParting = prevParting + 0.2;
 
-					if (parting != nParting){
-						if (tp1->isAPair && tp1->horizontal == horizontal){
-							nParting = tp1->makeModification(parting, nParting);
-						}
-						if (tp2->isAPair && tp2->horizontal == horizontal){
-							nParting = tp2->makeModification(parting, nParting);
-						}
-					}
+					float nextParting = (grabbed+2 > partings.size() ? 1 : partings[grabbed+1]);
+					if (nextParting - nParting < 0.2)
+						nParting = nextParting - 0.2;
+					
+					std::cout << "g: " << grabbed << " - " << nParting << " | " << prevParting << " - " << nextParting << std::endl;
 
-					parting = nParting;
+					partings[grabbed] = nParting;
 				}
 			}
 
-			if (horizontal){
-				int partingWidth = w * parting;
-				tp1->Update(x, y, partingWidth, h, mx, my);
-				tp2->Update(x + partingWidth, y, w  - partingWidth, h, mx, my);
-			} else {
-				int partingHeight = h * parting;
-				tp1->Update(x, y, w, partingHeight, mx, my);
-				tp2->Update(x, y + partingHeight, w, h - partingHeight, mx, my);
+			float lastParting = 0;
+			for (int i = 0; i < tps.size(); i++){
+				float thisParting = 0;
+				if (i == tps.size()){
+					thisParting = 1 - lastParting;
+					if (thisParting < 0)
+						thisParting = 0;
+				} else {
+					thisParting = partings[i] - lastParting;
+				}
+				if (horizontal){
+					tps[i]->Update(x + lastParting * w, y, w * thisParting, h, mx, my);
+				} else {
+					tps[i]->Update(x, y + lastParting * h, w, h * thisParting, mx, my);
+				}
+				lastParting += partings[i];
 			}
 		} else {
 			tile->Update();
@@ -142,26 +127,29 @@ public:
 			return;
 
 		if (isAPair){
-			if (horizontal){
-				int partingWidth = w * parting;
-				
-				if (-10 < x + partingWidth - mx && x + partingWidth - mx < 10){
-					grabbed = true;
-					return;
+			float lastParting = 0;
+			for (int i = 0; i < tps.size() - 1; i++){
+				float thisParting = partings[i] - lastParting;
+
+				if (horizontal){
+					std::cout << (x + (lastParting + thisParting) * w - mx) << " - " << (x + (lastParting + thisParting) * w - mx) << std::endl;
+					std::cout << lastParting << " - " << thisParting << std::endl;
+					if (-10 < x + (lastParting + thisParting) * w - mx && x + (lastParting + thisParting) * w - mx < 10){
+						grabbed = i;
+						return;
+					}
+
+					tps[i] -> MousePressed(x + lastParting * w, y, w * thisParting, h, mx, my);
+				} else {
+					if (-10 < y + (lastParting + thisParting) * h - my && y + (lastParting + thisParting) * h - my < 10){
+						grabbed = i;
+						return;
+					}
+					
+					tps[i] -> MousePressed(x, y + lastParting * h, w, h * thisParting, mx, my);
 				}
 
-				tp1->MousePressed(x, y, partingWidth, h, mx, my);
-				tp2->MousePressed(x + partingWidth, y, w - partingWidth, h, mx, my);
-			} else {
-				int partingHeight = h * parting;
-
-				if (-10 < y + partingHeight - my && y + partingHeight - my < 10){
-					grabbed = true;
-					return;
-				}
-
-				tp1->MousePressed(x, y, w, partingHeight, mx, my);
-				tp2->MousePressed(x, y + partingHeight, w, h - partingHeight, mx, my);
+				lastParting = thisParting;
 			}
 		} else {
 			tile->MousePressed(mx - x, my - y);
@@ -170,9 +158,9 @@ public:
 
 	void UnGrab(){
 		if (isAPair){
-			grabbed = false;
-			tp1->UnGrab();
-			tp2->UnGrab();
+			grabbed = -1;
+			for (int i = 0; i < tps.size(); i++)
+				tps[i]->UnGrab();
 		}
 	}
 };
