@@ -23,26 +23,22 @@ namespace Workspaces {
 		void Update() override;
 
 		void TestAddNote() {
-			NoteWithPosition testNote{ std::make_shared<Note>(), {0, 0} };
-
-			testNote.note.get()->size = {250, 80};
+			NoteWithPosition testNote{ std::make_shared<Note>("a", Vector2{250, 80}), {0, 0} };
 
 			std::shared_ptr<Elements::TextField> TF = std::make_shared<Elements::TextField>();
 			
-			TF->size = {160, 80};
+			TF->size = {250, 80};
 
 			testNote.note.get()->elements.push_back(TF);
 
 			notes.push_back(testNote);
 			
 			
-			NoteWithPosition testNote2{ std::make_shared<Note>(), {300, 0} };
-
-			testNote2.note.get()->size = {250, 80};
+			NoteWithPosition testNote2{ std::make_shared<Note>("b", Vector2{250, 80}), {300, 0} };
 
 			std::shared_ptr<Elements::TextField> TF2 = std::make_shared<Elements::TextField>();
 			
-			TF2->size = {160, 80};
+			TF2->size = {250, 80};
 			TF2->wrapping = 1;
 
 			testNote2.note.get()->elements.push_back(TF2);
@@ -50,13 +46,11 @@ namespace Workspaces {
 			notes.push_back(testNote2);
 			
 			
-			NoteWithPosition testNote3{ std::make_shared<Note>(), {600, 0} };
-
-			testNote3.note.get()->size = {250, 80};
+			NoteWithPosition testNote3{ std::make_shared<Note>("c", Vector2{250, 80}), {600, 0} };
 
 			std::shared_ptr<Elements::TextField> TF3 = std::make_shared<Elements::TextField>();
 			
-			TF3->size = {160, 80};
+			TF3->size = {250, 80};
 			TF3->wrapping = 2;
 
 			testNote3.note.get()->elements.push_back(TF3);

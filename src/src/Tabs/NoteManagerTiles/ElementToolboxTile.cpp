@@ -19,6 +19,5 @@ namespace Tabs::Tiles{
 	}
 
 	void ElementToolboxTile::MousePressed(int x, int y){
-		 std::cout << Tabs::NoteManagerTap::editingElement << std::endl;
 	}
 }

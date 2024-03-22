@@ -94,7 +94,7 @@ public:
 					if (nextParting - nParting < 0.2)
 						nParting = nextParting - 0.2;
 					
-					std::cout << "g: " << grabbed << " - " << nParting << " | " << prevParting << " - " << nextParting << std::endl;
+					//std::cout << "g: " << grabbed << " - " << nParting << " | " << prevParting << " - " << nextParting << std::endl;
 
 					partings[grabbed] = nParting;
 				}
@@ -132,8 +132,8 @@ public:
 				float thisParting = partings[i] - lastParting;
 
 				if (horizontal){
-					std::cout << (x + (lastParting + thisParting) * w - mx) << " - " << (x + (lastParting + thisParting) * w - mx) << std::endl;
-					std::cout << lastParting << " - " << thisParting << std::endl;
+					//std::cout << (x + (lastParting + thisParting) * w - mx) << " - " << (x + (lastParting + thisParting) * w - mx) << std::endl;
+					//std::cout << lastParting << " - " << thisParting << std::endl;
 					if (-10 < x + (lastParting + thisParting) * w - mx && x + (lastParting + thisParting) * w - mx < 10){
 						grabbed = i;
 						return;

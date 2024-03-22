@@ -1,6 +1,6 @@
 #include "Tabs/NoteManagerTap.h"
-std::string Tabs::NoteManagerTap::editingElement = "";
-
+std::string Tabs::NoteManagerTap::editingElement = "TestElement";
+std::unordered_map<std::string, NoteData> Tabs::NoteManagerTap::allNotes = {};
 #include "ElementInspectorTile.h"
 #include "ElementToolboxTile.h"
 #include "ShowWindowTile.h"

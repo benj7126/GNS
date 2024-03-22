@@ -10,11 +10,19 @@ namespace Elements { // managing note types
 	class TextField : public Element, public Elements::Interfaces::ILabel {
 	protected:
 		int cursorPosition = 0;
+		int highlightChar = -1;
 
 		float curX = 0;
 		float curY = 0;
 		float savedX = -1;
 		float savedY = -1;
+
+		bool hasBeenReleased = true;
+
+		Vector2 savedOffset = {};
+
+		float clickTime = -1;
+		int clickCount = 0;
 
 		/* dont know if its possible
 		int paddingUp = 5;

@@ -7,14 +7,20 @@
 #include <string>
 #include <memory>
 
+#include <iostream>
+
 class Note {
 public:
-	std::string Name; // more like a yupe
+	std::string name; // more like a yupe
 	Vector2 size;
-	std::vector<std::shared_ptr<Element>> elements;
+	std::vector<std::shared_ptr<Element>> elements{};
+
+	Note(std::string name, Vector2 size) : name{name}, size{size} {
+
+	}
 
 	virtual void Draw(Vector2 position) {
-		DrawRectangle(position.x, position.y, size.x, size.y, WHITE); // might want this to be an element idk yet...
+		// DrawRectangle(position.x, position.y, size.x, size.y, WHITE); // might want this to be an element idk yet...
 		DrawRectangleLines(position.x, position.y, size.x, size.y, BLACK);
 
 		for (std::shared_ptr<Element> e : elements) {

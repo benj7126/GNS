@@ -2,12 +2,14 @@
 
 #include "FontManager.h"
 
+#include <algorithm>
+
 #include <iostream>
 #include <vector>
 
 #include "KeyInput.h"
 
-DataStructBase Elements::TextField::GenerateDataStruct(){
+DataStructBase Elements::TextField::GenerateDataStruct() {
 	DataStructHolder returnBase{};
 
 	// returnBase.subStruct.insert();
@@ -18,16 +20,65 @@ DataStructBase Elements::TextField::GenerateDataStruct(){
 }
 
 void Elements::TextField::InternalDraw(Vector2 offset) {
+	savedOffset = offset;
 	DrawRectangle(offset.x + position.x, offset.y + position.y, size.x, size.y, ORANGE); // size is {0, 0}...
-
 	CustomTextDraw({offset.x + position.x, offset.y + position.y});
 }
 
 void Elements::TextField::MousePressed(Vector2 pos) {
-	std::cout << "test char pos thingy: " << pos.x << ", " << pos.y << std::endl;
+	// std::cout << "test char pos thingy: " << pos.x << ", " << pos.y << std::endl;
+	int oldCP = cursorPosition;
 	cursorPosition = GetCursorIndex(pos);
+	// std::cout << GetTime() << std::endl;
 	selectedElement = this;
+	hasBeenReleased = false;
 	savedX = -1;
+
+	if (oldCP == cursorPosition){
+		if (clickCount == 0)
+			clickTime = GetTime();
+		else if (GetTime() - clickTime <= 1)
+			{ clickCount++; clickTime = GetTime(); }
+		else
+			clickCount = 0;
+
+		if (clickCount > 0){
+			std::vector<char> stopChars;
+			
+			switch (clickCount){
+				case 1:
+					stopChars = {' ', ',', '.'}; // might want to make character groups, where one group is space characters like tab and space and another is just , and ofc one thats letters(+nrs) and so on...
+					break;
+				case 2:
+					stopChars = {'\n'};
+					break;
+				default:
+					stopChars = {' ', ',', '.', '\n'};
+					break;
+			}
+
+			int leftPosition = cursorPosition;
+			int rightPosition = cursorPosition;
+
+			char curChar = text.at(cursorPosition);
+			while (leftPosition != 0) {
+				char nextChar = text.at(leftPosition - 1);
+
+				if (std::find(stopChars.begin(), stopChars.end(), nextChar) == stopChars.end()){
+					break;
+				}
+
+				leftPosition--;
+			}
+
+			std::cout << leftPosition << " -pos" << std::endl;
+		}
+	} else {
+		clickCount = 0;
+	}
+		
+	highlightChar = cursorPosition;
+
 	// TextInputHandler::LinkForInput(&text);
 }
 
@@ -39,6 +90,23 @@ void Elements::TextField::Update(){
 	int prevCursorPosition = cursorPosition;
 
 	if (selectedElement == this){
+
+		if (!hasBeenReleased){
+			if (IsMouseButtonUp(MOUSE_BUTTON_LEFT)){
+				hasBeenReleased = true;
+			} else {
+				Vector2 tMPos = GetMousePosition();
+				Vector2 mPos = {tMPos.x - savedOffset.x, tMPos.y - savedOffset.y};
+				int nCursorPos = GetCursorIndex(mPos);
+
+				if (mPos.x < 0 || mPos.y < 0)
+					nCursorPos = 0;
+				
+				if (highlightChar != cursorPosition || nCursorPos != cursorPosition)
+					cursorPosition = nCursorPos;
+			}
+		}
+
 		int key = GetCharPressed();
 
 		while (key > 0)
@@ -54,9 +122,13 @@ void Elements::TextField::Update(){
 
 			key = GetCharPressed();
 		}
+		
+		if (GetKeyPressed() > 0)
+			highlightChar = -1;
 
 		if (KeyInput::KeyActive(KEY_BACKSPACE))
 		{
+			highlightChar = -1;
 			if (cursorPosition != 0){
 				if (IsKeyDown(KEY_RIGHT_CONTROL) || IsKeyDown(KEY_LEFT_CONTROL)){
 					char curChar = text.at(cursorPosition - 1);
@@ -217,6 +289,13 @@ void Elements::TextField::Update(){
 }
 
 
+bool InBetween(int val, int v1, int v2){
+	if (v1 > v2)
+		return val < v1 && val > v2-1;
+	else
+		return val < v2 && val > v1-1;
+}
+
 // need to make it so that only one element can be selected at a time and then make it work that way around instead of making TextInputHandler edit a pointer...
 
 void Elements::TextField::DrawCodepointAt(Vector2 origin, std::vector<int> codepointBuffer, int& curIndex, float &textOffsetX, float textOffsetY, bool &didDrawCursor){
@@ -224,7 +303,14 @@ void Elements::TextField::DrawCodepointAt(Vector2 origin, std::vector<int> codep
 
 	if (codepointBuffer.size() > 0){
 		for (int cp : codepointBuffer){
-			DrawTextCodepoint(font, cp, { origin.x + textOffsetX, origin.y + textOffsetY }, fontSize, BLACK);
+			int index = GetGlyphIndex(font, cp);
+			float cWidth = (font.glyphs[index].advanceX == 0 ? (float)font.recs[index].width : (float)font.glyphs[index].advanceX) + spacing;
+
+			if (highlightChar != cursorPosition && highlightChar != -1 && InBetween(curIndex, highlightChar, cursorPosition)){
+				DrawRectangle(origin.x + textOffsetX, origin.y + textOffsetY, cWidth, fontSize, GRAY);
+			}
+
+			DrawTextCodepoint(font, cp, { origin.x + textOffsetX, origin.y + textOffsetY}, fontSize, BLACK);
 			
 			// std::cout << curIndex << " is " << (curIndex == cursorPosition) << std::endl;
 
@@ -237,9 +323,7 @@ void Elements::TextField::DrawCodepointAt(Vector2 origin, std::vector<int> codep
 			}
 
 			curIndex++; // idk if this should be here or before, but whatever...
-
-			int index = GetGlyphIndex(font, cp);
-			textOffsetX += (font.glyphs[index].advanceX == 0 ? (float)font.recs[index].width : (float)font.glyphs[index].advanceX) + spacing;
+			textOffsetX += cWidth;
 		}
 	}
 }
@@ -270,7 +354,7 @@ void Elements::TextField::CustomTextDraw(Vector2 origin) {
         int codepointByteCount = 0;
         int codepoint = GetCodepointNext(&text[i], &codepointByteCount);
 		int cpIndex = GetGlyphIndex(font, codepoint);
-		
+
 		if (i+1 < size){
 			int nextCodepoint = GetCodepointNext(&text[i+1], &codepointByteCount);
 			int nextCodepointIndex = GetGlyphIndex(font, nextCodepoint);
@@ -306,9 +390,9 @@ void Elements::TextField::CustomTextDraw(Vector2 origin) {
 			codepointBufferWidth += (font.glyphs[cpIndex].advanceX == 0 ? (float)font.recs[cpIndex].width : (float)font.glyphs[cpIndex].advanceX) + spacing;
 
 			if (codepoint == ' ' || codepoint == '\t' || wrapping == 0 || wrapping == 2 || i + 1 == size || curLineWidth + nextCharWidth + codepointBufferWidth > this->size.x) {
-			std::cout << curLineWidth + nextCharWidth + codepointBufferWidth << " > " << (this->size.x) << std::endl;
+			// std::cout << curLineWidth + nextCharWidth + codepointBufferWidth << " > " << (this->size.x) << std::endl;
 				if (curLineWidth + nextCharWidth + codepointBufferWidth > this->size.x && wrapping != 2 && !(codepoint == ' ' || codepoint == '\t')){
-					std::cout << "fg" << std::endl;
+					// std::cout << "fg" << std::endl;
 					bool wasZero = curLineWidth == 0;
 					if ((wrapping == 1 && curLineWidth != 0) && textOffsetY + textLineSpacing + fontSize <= this->size.y) {
 						textOffsetY += textLineSpacing;
@@ -505,7 +589,7 @@ int Elements::TextField::GetCursorIndex(Vector2 localMousePosition) {
             // NOTE: Line spacing is a global variable, use SetTextLineSpacing() to setup
 
 			if (textOffsetY < localMousePosition.y && textOffsetY + fontSize > localMousePosition.y){
-				std::cout << textOffsetY << " | " << localMousePosition.y << " - " << fontSize << std::endl;
+				// std::cout << textOffsetY << " | " << localMousePosition.y << " - " << fontSize << std::endl;
 				return curIndex;
 			}
 
